@@ -39,6 +39,21 @@ class: center, middle
 Un test es:
 "Un código que prueba el correcto funciona de otro código"
 
+Ejemplo
+```java
+public class Test {
+
+  @Test
+  public void test() {
+    int resultado = suma(1,2);
+    assertTrue(3, resultado);
+  }
+
+  public int suma(int a, int b) {
+    return a+b;
+  }
+}
+```
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
     </script>
