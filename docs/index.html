@@ -268,6 +268,139 @@ Sospechamos que funciona mal.
 
  Consejo: Usa las anotaciones del ciclo de vida.
 ---
+# JaCoCo
+https://github.com/jacoco/jacoco
+
+Configuración en Maven:
+```xml
+<plugin>
+				<groupId>org.jacoco</groupId>
+				<artifactId>jacoco-maven-plugin</artifactId>
+				<version>${jacoco.version}</version>
+				<executions>
+					<execution>
+						<id>prepare-agent</id>
+						<goals>
+							<goal>prepare-agent</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>report</id>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+					</execution>
+					<execution>
+						<id>post-unit-test</id>
+						<phase>test</phase>
+						<goals>
+							<goal>report</goal>
+						</goals>
+						<configuration>
+							<!-- Sets the path to the file which contains the execution data. -->
+
+							<dataFile>target/jacoco.exec</dataFile>
+							<!-- Sets the output directory for the code coverage report. -->
+							<outputDirectory>target/jacoco-ut</outputDirectory>
+						</configuration>
+					</execution>
+				</executions>
+				<configuration>
+					<systemPropertyVariables>
+						<jacoco-agent.destfile>target/jacoco.exec</jacoco-agent.destfile>
+					</systemPropertyVariables>
+				</configuration>
+			</plugin>
+```
+---
+# JaCoCo
+
+Ejecución con maven:
+```
+mvn test
+```
+Ejecución con Eclipse (a través de Maven):
+```
+Sobre el proyecto --> botón derecho --> Run As --> maven test
+```
+
+Informes de Cobertura:
+```
+target/jacoco-ut/index.html
+```
+**NOTA**: JaCoCo sólo genera los informes si todos los tests pasan OK.
+---
+# Cobertura
+
+Se refiere a las líneas de código que han sido ejecutadas
+como resultado de pasar los tests.
+
+---
+# Demo: Cobertura
+```java
+public class Direccion {
+
+	private String direccion;
+
+	public Direccion(String direccion) {
+		this.direccion = direccion;
+	}
+
+	public String getCodigoPostal() {
+		Pattern pattern = Pattern.compile("[0-9]{5}");
+		Matcher matcher = pattern.matcher(this.direccion);
+		if (matcher.find()) {
+			return matcher.group();
+		}
+		return null;
+	}
+
+}
+```
+
+---
+# Demo: Cobertura
+```java
+public class CoberturaTest {
+
+	@Test
+	public void obtenerCodigoPostal() {
+		Direccion direccion = new Direccion("Calle Vicente Barrera Cambra 6 bajo (46020)");
+		String codigoPostal = direccion.getCodigoPostal();
+		assertEquals("46020", codigoPostal);
+	}
+
+	@Test
+	public void noHayCodigoPostal() {
+		Direccion direccion = new Direccion("Calle Vicente Barrera Cambra 6 bajo");
+		String codigoPostal = direccion.getCodigoPostal();
+		assertNull(codigoPostal);
+	}
+
+}
+```
+---
+# JaCoco
+Informe de cobertura de la clase Direccion:
+
+![](imgs/jacoco-cien-por-cien.png)
+---
+# Cuestiones filosóficas II
+![](imgs/philosoraptor-2.jpg)
+
+
+---
+# Contraejemplo: 100% cobertura != código libre de fallos
+
+```java
+@Test(expected = NullPointerException.class)
+public void lanzaExcepcionSiLePasoUnStringNulo() {
+  Direccion direccion = new Direccion(null);
+  String codigoPostal = direccion.getCodigoPostal();
+  assertNull(codigoPostal);
+}
+```
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
