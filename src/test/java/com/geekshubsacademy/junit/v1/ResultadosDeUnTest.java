@@ -6,16 +6,16 @@ import javax.management.RuntimeErrorException;
 
 import org.junit.Test;
 
-public class HolaMundoTest {
-
-	@Test
-	public void esteTestFalla() {
-		fail("Not yet implemented");
-	}
+public class ResultadosDeUnTest {
 
 	@Test
 	public void esteTestRompe() throws Exception {
 		throw new Exception("Este test rompe");
+	}
+
+	@Test
+	public void esteTestFalla() {
+		fail("Not yet implemented");
 	}
 
 	@Test

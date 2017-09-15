@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Title</title>
+    <title>GeeksHubsAcademy.com - Curso de JUnit, Jacoco y Mockito</title>
     <meta charset="utf-8">
     <style>
       @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
@@ -14,6 +14,21 @@
         font-weight: normal;
       }
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+      /* Two-column layout */
+    .left-column {
+      color: #777;
+      width: 20%;
+      height: 92%;
+      float: left;
+    }
+      .left-column h2:last-of-type, .left-column h3:last-child {
+        color: #000;
+      }
+    .right-column {
+      width: 75%;
+      float: right;
+      padding-top: 1em;
+    }
     </style>
   </head>
   <body>
@@ -81,6 +96,12 @@ class: center, middle
 
 ---
 
+# Cuestiones filosóficas
+![](imgs/philosoraptor.png)
+---
+![](imgs/watchmen.png)
+---
+
 # Ejemplo
 
 # Test en JUnit
@@ -102,19 +123,149 @@ public class Test {
 
 ---
 
+# Estructura de un Test (AAA)
+
+- Arrange (Preparar)
+- Act (Probar)
+- Assert (Verificar)
+
+```java
+public class MiTest {
+
+	@Test
+	public void test() {
+		// Preparar
+		String pattern = "dd/MM/yyyy";
+		SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
+		Calendar calendario = Calendar.getInstance();
+		calendario.set(2017, 8, 15);
+
+		// Probar
+		String fechaConFormato = dateFormat.format(calendario.getTime());
+
+		// Verificar
+		assertEquals("15/09/2017", fechaConFormato);
+	}
+
+}
+```
+---
 # Demo
 
 # Eclipse + Maven + JUnit
 
 http://www.eclipse.org/
 
-https://maven.apache.org/
-
 https://maven.apache.org/guides/getting-started/index.html
 
-http://junit.org/junit5/
-
 http://junit.org/junit4/
+
+---
+# Maven
+`pom.xml`
+```xml
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+                      http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.geekshubsacademy</groupId>
+  <artifactId>curso-junit</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0.0-SNAPSHOT</version>
+  <name>Curso de JUnit</name>
+  <url>http://geekshubsacademy.com</url>
+  <dependencies>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.11</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>
+```
+---
+# Eclipse
+
+![](imgs/eclipse-import-maven-project.png)
+---
+#JUnit
+Para ejecutar JUnit desde Eclipse:
+
+Sobre la clase de Test --> click derecho --> Run As --> JUnit
+
+![](imgs/eclipse-run-junit.png)
+---
+#JUnit
+Resultados:
+- Rojo: Se ha producido una **excepcion** al ejecutar el código
+- Azul: El test no ha satisfecho las expectativas
+- Verde: El test ha pasado OK.
+
+![](imgs/eclipse-junit-resultados.png)
+
+---
+class: middle, center
+
+# @Anotaciones de JUnit
+# Ciclo de Vida de un Test
+## @BeforeClass
+## @Before
+## @Test
+## @After
+## @AfterClass
+### @Ignore
+
+---
+# Demo: Ciclo de Vida
+
+```java
+public class CicloVidaTest {
+
+	private static String ciclo = "";
+
+	@BeforeClass
+	public static void beforeClass() {
+		ciclo += "@BeforeClass";
+		assertEquals("@BeforeClass", ciclo);
+	}
+
+	@Before
+	public void before() {
+		ciclo += " @Before";
+		assertEquals("@BeforeClass @Before", ciclo);
+	}
+
+	@Test
+	public void test() {
+		ciclo += " @Test 1";
+		assertEquals("@BeforeClass @Before @Test 1", ciclo);
+	}
+
+	@After
+	public void after() {
+		ciclo += " @After";
+		assertEquals("@BeforeClass @Before @Test 1 @After", ciclo);
+	}
+
+	@AfterClass
+	public static void afterClass() {
+		ciclo += " @AfterClass";
+		assertEquals("@BeforeClass @Before @Test 1 @After @AfterClass", ciclo);
+	}
+
+}
+```
+---
+# Ejercicio:
+En el proyecto de Eclipse hay una clase ValidadorEmail.
+Sospechamos que funciona mal.
+## Objetivo
+"Escribe una clase con varios @Test para la clase ValidadorEmail.
+ Algunos tests fallarán (azul),
+ pero en ningún caso deberían arrojar una Excepción (rojo)."
+---
 
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
