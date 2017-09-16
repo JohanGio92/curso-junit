@@ -575,11 +575,11 @@ el test romperá.
 # Caja blanca : Ejemplo de falso positivo
 Si cambio la SQL de LoginController:
 ```java
-connection.prepareStatement("Quak!");
+connection.prepareStatement("Quack!");
 ```
 Este test con Mockito pasa OK:
 
-```
+```java
 @Test
 public void testLoginConCertificado() throws CertificateException, SQLException {
   ...
