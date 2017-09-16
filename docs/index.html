@@ -324,7 +324,6 @@ Ejecución con Eclipse (a través de Maven):
 ```
 Sobre el proyecto --> botón derecho --> Run As --> maven test
 ```
-
 Informes de Cobertura:
 ```
 target/jacoco-ut/index.html
@@ -391,14 +390,30 @@ Informe de cobertura de la clase Direccion:
 
 
 ---
-# Contraejemplo: 100% cobertura != código libre de fallos
+# Contraejemplo:
+
+## 100% cobertura != código libre de fallos
 
 ```java
-@Test(expected = NullPointerException.class)
-public void lanzaExcepcionSiLePasoUnStringNulo() {
-  Direccion direccion = new Direccion(null);
-  String codigoPostal = direccion.getCodigoPostal();
-  assertNull(codigoPostal);
+public class Calculadora {
+
+	public static int dividir(int a, int b) {
+		return a / b;
+	}
+
+}
+
+public class CienPorCienCoberturaConErroresTest {
+
+	@Test
+	public void esteTestCubreElCienPorCienDeLaClaseCalculadora() {
+		assertEquals(2, Calculadora.dividir(4, 2));
+	}
+
+	@Test
+	public void sinEmbargoEsteTestLanzaArithmeticExceptionAlDividirPorCero() {
+		assertEquals(2, Calculadora.dividir(4, 0));
+	}
 }
 ```
 
