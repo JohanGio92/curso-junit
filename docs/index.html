@@ -441,7 +441,7 @@ public class CienPorCienCoberturaConErroresTest {
 - Fabricación de datos de pruebas --> [Estamos solos]
 - Creación de objetos para inyectar/pasar por parámetro --> **[Mockito]**
 - Instanciación del objeto a testear --> [Spring Framework]
-- Verificación de los resultados --> [Hamcrest]
+- Verificación de los resultados --> **[Hamcrest]**
 
 ---
 # Mockito
@@ -568,18 +568,61 @@ public void testSinSentido() throws CertificateException {
 los detalles de la implementación del código que prueban.
 - Esto implica directamente que al cambiar la implementación,
 el test romperá.
+- Los test de caja blanca son propensos a **falsos positivos!**.
 - Es por ello que se habla de "fragilidad" de los tests de caja blanca.
 - Test frágiles === Mucho mantenimiento
 ---
+# Caja blanca : Ejemplo de falso positivo
+Si cambio la SQL de LoginController:
+```java
+connection.prepareStatement("Quak!");
+```
+Este test con Mockito pasa OK:
+
+```
+@Test
+public void testLoginConCertificado() throws CertificateException, SQLException {
+  ...
+  PreparedStatement preparedStatement = mock(PreparedStatement.class);
+  when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+  ...
+  // Probar
+  LoginController controller = new LoginController(connection);
+  boolean login = controller.login(certificado);
+
+  // Verificar
+  assertTrue(login);
+}
+
+```
+---
+# Verificación de Mocks
+---
+# Mockito: Spies
+---
 # Propiedades deseables en una suite de pruebas
 ## Siglas en inglés: FIRST
-- **F**ast: Que pasen rápido, muy rápido.
-- **I**solation: Que unos tests no impacten en otros.
+- **F**ast: Que pasen rápido, **muy** rápido.
+- **I**ndependent: Que unos tests no impacten en otros.
 - **R**epeatable: Que un test no falle si lo paso más de una vez (bajo las mismas condiciones).
+- **S**elf-checking: Que no haya intervencion manual para verificar si un test pasa Ok.
 - **T**imely: Que estén escritos antes de que sea demasiado tarde.
 ---
 # Hamcrest
 
+http://hamcrest.org/
+http://www.baeldung.com/java-junit-hamcrest-guide
+http://www.baeldung.com/hamcrest-collections-arrays
+
+`pom.xml`
+```xml
+<dependency>
+  <groupId>org.hamcrest</groupId>
+  <artifactId>hamcrest-all</artifactId>
+  <version>${hamcrest.version}</version>
+  <scope>test</scope>
+</dependency>
+```
 ---
 TODO:
 - JUnit 4 vs 5
