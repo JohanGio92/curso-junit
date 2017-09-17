@@ -138,7 +138,7 @@ public class MiTest {
 		String pattern = "dd/MM/yyyy";
 		SimpleDateFormat dateFormat = new SimpleDateFormat(pattern);
 		Calendar calendario = Calendar.getInstance();
-		calendario.set(2017, 8, 15);
+*		calendario.set(2017, 8, 15);
 
 		// Probar
 		String fechaConFormato = dateFormat.format(calendario.getTime());
@@ -267,6 +267,209 @@ Sospechamos que funciona mal.
  pero en ningún caso deberían arrojar una Excepción (rojo)."
 
  Consejo: Usa las anotaciones del ciclo de vida.
+---
+# Motivos frecuentes para no testear
+
+1. A veces es complicado testear el código existente
+2. Tengo prisa por entregar/corregir este bug y no puedo perder tiempo testeando
+3. Mantener los tests lleva mucho tiempo y esfuerzo
+
+---
+# Complicaciones técnicas para testear
+
+- Fabricación de datos de pruebas
+- Creación de objetos para inyectar dependencias/pasar por parámetro
+- Instanciación del objeto a testear
+- Verificación de los resultados
+
+---
+# Soluciones técnicas para testear
+
+- Fabricación de datos de pruebas --> [Estamos solos]
+- Creación de objetos para inyectar/pasar por parámetro --> **[Mockito]**
+- Instanciación del objeto a testear --> [Spring Framework]
+- Verificación de los resultados --> **[Hamcrest]**
+
+---
+# Mockito
+
+http://site.mockito.org/
+
+"Mockito es una librería para instanciar objetos
+a partir de tipos (clases/interfaces)
+y programar respuestas concretas
+cuando se llama a los métodos del objeto instanciado"
+`pom.xml`
+```xml
+<dependency>
+  <groupId>org.mockito</groupId>
+  <artifactId>mockito-core</artifactId>
+  <version>4.12</version>
+  <scope>test</scope>
+</dependency>
+```
+---
+# Mockito: Ejemplo
+## Login con Certificado digital
+```java
+public class LoginController {
+
+	private Connection connection;
+
+	public LoginController(Connection connection) {
+		this.connection = connection;
+	}
+
+	public boolean login(X509Certificate certificado) {
+		boolean resultado = false;
+		PreparedStatement prepareStatement = null;
+		ResultSet resultSet = null;
+
+			Principal subjectDN = certificado.getSubjectDN();
+			prepareStatement = connection.prepareStatement("SELECT count(*) FROM usuarios where login = ?");
+			prepareStatement.setString(1, subjectDN.getName());
+			resultSet = prepareStatement.executeQuery();
+			if (resultSet.next()) {
+				resultado = resultSet.getInt(1) > 0;
+			}
+    return resultado;
+}
+```
+---
+# Ejemplo: Test sin Mockito
+- Tendría que tener un fichero con un Certificado de pruebas
+- Tendría que tener una BDD corriendo para obtener una Conexión
+```java
+@Test
+public void testLoginConCertificado() throws CertificateException {
+  // Preparar
+  byte[] certData = new byte[0];
+  X509Certificate certificado = X509Certificate.getInstance(certData);
+  Connection connection = null;
+
+  // Probar
+  LoginController controller = new LoginController(connection);
+  boolean login = controller.login(certificado);
+
+  // Verificar
+  assertTrue(login);
+}
+```
+- No tengo ninguna, en este caso fallaría el test
+
+---
+# Ejemplo: Test con Mockito
+- No necesito un fichero con un Certificado ni una BDD con datos de prueba
+- Mockito le dice a los objetos qué valores tienen que devolver
+
+```java
+@Test
+public void testLoginConCertificado() throws CertificateException, SQLException {
+  // Preparar
+  X509Certificate certificado = mock(X509Certificate.class);
+  Connection connection = mock(Connection.class);
+
+  // Programar respuestas
+  Principal principal = mock(Principal.class);
+  when(certificado.getSubjectDN()).thenReturn(principal);
+  when(principal.getName()).thenReturn("usuario");
+
+  PreparedStatement preparedStatement = mock(PreparedStatement.class);
+  when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+  ResultSet resultSet = mock(ResultSet.class);
+  when(preparedStatement.executeQuery()).thenReturn(resultSet);
+  when(resultSet.next()).thenReturn(true);
+  when(resultSet.getInt(1)).thenReturn(1);
+
+  // Probar
+  LoginController controller = new LoginController(connection);
+  boolean login = controller.login(certificado);
+
+  // Verificar
+  assertTrue(login);
+}
+```
+---
+# Cuestiones Filosóficas IV
+¿Y si directamente _mockeo_ la clase LoginController?
+Este test pasa Ok!
+```java
+@Test
+public void testSinSentido() throws CertificateException {
+  // Probar
+  LoginController controller = mock(LoginController.class);
+  when(controller.login(null)).thenReturn(true);
+  boolean login = controller.login(null);
+
+  // Verificar
+  assertTrue(login);
+}
+
+```
+---
+# Caja blanca vs caja negra
+![](imgs/caja-blanca-caja-negra.png)
+---
+# Caja blanca: Peligro!
+- Los test de caja blanca tienen la desventaja de necesitar conocer
+los detalles de la implementación del código que prueban.
+- Esto implica directamente que al cambiar la implementación,
+el test romperá.
+- Es por ello que se habla de "fragilidad" de los tests de caja blanca.
+- Test frágiles === Mucho mantenimiento
+- Los test de caja blanca son propensos a **falsos positivos!**.
+---
+# Caja blanca : Ejemplo de falso positivo
+Si cambio la SQL de LoginController:
+```java
+connection.prepareStatement("Quack!");
+```
+Este test con Mockito pasa OK:
+
+```java
+@Test
+public void testLoginConCertificado() throws CertificateException, SQLException {
+  ...
+  PreparedStatement preparedStatement = mock(PreparedStatement.class);
+  when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+  ...
+  // Probar
+  LoginController controller = new LoginController(connection);
+  boolean login = controller.login(certificado);
+
+  // Verificar
+  assertTrue(login);
+}
+
+```
+---
+# Verificación de Mocks
+---
+# Mockito: Spies
+---
+# Propiedades deseables en una suite de pruebas
+## Siglas en inglés: FIRST
+- **F**ast: Que pasen rápido, **muy** rápido.
+- **I**ndependent: Que unos tests no impacten en otros.
+- **R**epeatable: Que un test no falle si lo paso más de una vez (bajo las mismas condiciones).
+- **S**elf-checking: Que no haya intervencion manual para verificar si un test pasa Ok.
+- **T**imely: Que estén escritos antes de que sea demasiado tarde.
+---
+# Hamcrest
+
+http://hamcrest.org/
+http://www.baeldung.com/java-junit-hamcrest-guide
+http://www.baeldung.com/hamcrest-collections-arrays
+
+`pom.xml`
+```xml
+<dependency>
+  <groupId>org.hamcrest</groupId>
+  <artifactId>hamcrest-all</artifactId>
+  <version>${hamcrest.version}</version>
+  <scope>test</scope>
+</dependency>
+```
 ---
 # JaCoCo
 https://github.com/jacoco/jacoco
@@ -412,7 +615,7 @@ public class CienPorCienCoberturaConErroresTest {
 
 	@Test
 	public void sinEmbargoEsteTestLanzaArithmeticExceptionAlDividirPorCero() {
-		assertEquals(2, Calculadora.dividir(4, 0));
+*		assertEquals(2, Calculadora.dividir(4, 0));
 	}
 }
 ```
@@ -420,209 +623,6 @@ public class CienPorCienCoberturaConErroresTest {
 # Cuestiones Filosóficas III
 
 ![](imgs/philosoraptor-3.jpg)
----
-# Motivos frecuentes para no testear
-
-1. A veces es complicado testear el código existente
-2. Tengo prisa por entregar/corregir este bug y no puedo perder tiempo testeando
-3. Mantener los tests lleva mucho tiempo y esfuerzo
-
----
-# Complicaciones técnicas para testear
-
-- Fabricación de datos de pruebas
-- Creación de objetos para inyectar dependencias/pasar por parámetro
-- Instanciación del objeto a testear
-- Verificación de los resultados
-
----
-# Soluciones técnicas para testear
-
-- Fabricación de datos de pruebas --> [Estamos solos]
-- Creación de objetos para inyectar/pasar por parámetro --> **[Mockito]**
-- Instanciación del objeto a testear --> [Spring Framework]
-- Verificación de los resultados --> **[Hamcrest]**
-
----
-# Mockito
-
-http://site.mockito.org/
-
-"Mockito es una librería para instanciar objetos
-a partir de tipos (clases/interfaces)
-y programar respuestas concretas
-cuando se llama a los métodos del objeto instanciado"
-`pom.xml`
-```xml
-<dependency>
-  <groupId>org.mockito</groupId>
-  <artifactId>mockito-core</artifactId>
-  <version>4.12</version>
-  <scope>test</scope>
-</dependency>
-```
----
-# Mockito: Ejemplo
-## Login con Certificado digital
-```java
-public class LoginController {
-
-	private Connection connection;
-
-	public LoginController(Connection connection) {
-		this.connection = connection;
-	}
-
-	public boolean login(X509Certificate certificado) {
-		boolean resultado = false;
-		PreparedStatement prepareStatement = null;
-		ResultSet resultSet = null;
-
-			Principal subjectDN = certificado.getSubjectDN();
-			prepareStatement = connection.prepareStatement("SELECT count(*) FROM usuarios where login = ?");
-			prepareStatement.setString(1, subjectDN.getName());
-			resultSet = prepareStatement.executeQuery();
-			if (resultSet.next()) {
-				resultado = resultSet.getInt(1) > 0;
-			}
-    return resultado;
-}
-```
----
-# Ejemplo: Test sin Mockito
-- Tendría que tener un fichero con un Certificado de pruebas
-- Tendría que tener una BDD corriendo para obtener una Conexión
-```java
-@Test
-public void testLoginConCertificado() throws CertificateException {
-  // Preparar
-  byte[] certData = new byte[0];
-  X509Certificate certificado = X509Certificate.getInstance(certData);
-  Connection connection = null;
-
-  // Probar
-  LoginController controller = new LoginController(connection);
-  boolean login = controller.login(certificado);
-
-  // Verificar
-  assertTrue(login);
-}
-```
-- No tengo ninguna, en este caso fallaría el test
-
----
-# Ejemplo: Test con Mockito
-- No necesito un fichero con un Certificado ni una BDD con datos de prueba
-- Mockito le dice a los objetos qué valores tienen que devolver
-
-```java
-@Test
-public void testLoginConCertificado() throws CertificateException, SQLException {
-  // Preparar
-  X509Certificate certificado = mock(X509Certificate.class);
-  Connection connection = mock(Connection.class);
-
-  // Programar respuestas
-  Principal principal = mock(Principal.class);
-  when(certificado.getSubjectDN()).thenReturn(principal);
-  when(principal.getName()).thenReturn("usuario");
-
-  PreparedStatement preparedStatement = mock(PreparedStatement.class);
-  when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-  ResultSet resultSet = mock(ResultSet.class);
-  when(preparedStatement.executeQuery()).thenReturn(resultSet);
-  when(resultSet.next()).thenReturn(true);
-  when(resultSet.getInt(1)).thenReturn(1);
-
-  // Probar
-  LoginController controller = new LoginController(connection);
-  boolean login = controller.login(certificado);
-
-  // Verificar
-  assertTrue(login);
-}
-```
----
-# Cuestiones Filosóficas IV
-¿Y si directamente _mockeo_ la clase LoginController?
-Este test pasa Ok!
-```java
-@Test
-public void testSinSentido() throws CertificateException {
-  // Probar
-  LoginController controller = mock(LoginController.class);
-  when(controller.login(null)).thenReturn(true);
-  boolean login = controller.login(null);
-
-  // Verificar
-  assertTrue(login);
-}
-
-```
----
-# Caja blanca vs caja negra
-![](imgs/caja-blanca-caja-negra.png)
----
-# Caja blanca vs caja negra
-- Los test de caja blanca tienen la desventaja de necesitar conocer
-los detalles de la implementación del código que prueban.
-- Esto implica directamente que al cambiar la implementación,
-el test romperá.
-- Los test de caja blanca son propensos a **falsos positivos!**.
-- Es por ello que se habla de "fragilidad" de los tests de caja blanca.
-- Test frágiles === Mucho mantenimiento
----
-# Caja blanca : Ejemplo de falso positivo
-Si cambio la SQL de LoginController:
-```java
-connection.prepareStatement("Quack!");
-```
-Este test con Mockito pasa OK:
-
-```java
-@Test
-public void testLoginConCertificado() throws CertificateException, SQLException {
-  ...
-  PreparedStatement preparedStatement = mock(PreparedStatement.class);
-  when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
-  ...
-  // Probar
-  LoginController controller = new LoginController(connection);
-  boolean login = controller.login(certificado);
-
-  // Verificar
-  assertTrue(login);
-}
-
-```
----
-# Verificación de Mocks
----
-# Mockito: Spies
----
-# Propiedades deseables en una suite de pruebas
-## Siglas en inglés: FIRST
-- **F**ast: Que pasen rápido, **muy** rápido.
-- **I**ndependent: Que unos tests no impacten en otros.
-- **R**epeatable: Que un test no falle si lo paso más de una vez (bajo las mismas condiciones).
-- **S**elf-checking: Que no haya intervencion manual para verificar si un test pasa Ok.
-- **T**imely: Que estén escritos antes de que sea demasiado tarde.
----
-# Hamcrest
-
-http://hamcrest.org/
-http://www.baeldung.com/java-junit-hamcrest-guide
-http://www.baeldung.com/hamcrest-collections-arrays
-
-`pom.xml`
-```xml
-<dependency>
-  <groupId>org.hamcrest</groupId>
-  <artifactId>hamcrest-all</artifactId>
-  <version>${hamcrest.version}</version>
-  <scope>test</scope>
-</dependency>
-```
 ---
 TODO:
 - JUnit 4 vs 5
@@ -632,7 +632,9 @@ TODO:
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
     </script>
     <script>
-      var slideshow = remark.create();
+      var slideshow = remark.create({
+        highlightLines: true
+      });
     </script>
   </body>
 </html>
