@@ -62,12 +62,9 @@ class: center, middle
 
 ---
 # JUnit
-  0. JUnit 4 vs JUnit 5
-  0. @Anotaciones de la A a la Z
   1. Test: Hola Mundo
   2. @Test, @Before, ...
   3. Assertions
-    0. Fail fast vs. Fail last
     1. JUnit
     2. Hamcrest
 ---
@@ -841,9 +838,156 @@ más elaborado.
 ![](imgs/test-pyramid.png)
 
 ---
-# Bonus: Test Parametrizados
+# JUnit: Categorías de Tests
 
+La anotación @Category asocia un Test a un grupo
+que luego se puede ejecutar individualmente.
 
+Ejemplo:
+
+```java
+import org.junit.Test;
+import org.junit.experimental.categories.Category;
+
+@Category(TestDeIntegracion.class)
+public class CategoriaIntegracionTest {
+
+	@Test
+	public void test() {
+		System.out.println("Soy un test de integracion");
+	}
+
+}
+```
+
+Donde `TestDeIntegracion` es una clase/interfaz arbitraria que sive como "marcador".
+```java
+public interface TestDeIntegracion {
+
+}
+```
+
+---
+# JUnit: Categorías de Tests
+
+Lanzar exclusivamente los test de **integración** con Maven:
+```
+maven test -Dgroups=com.geekshubsacademy.junit.v8.TestDeIntegracion
+```
+Lanzar exclusivamente los test **unitarios** con Maven:
+```
+maven test -DexcludedGroups=com.geekshubsacademy.junit.v8.TestDeIntegracion
+```
+
+---
+# JUnit: Rules
+
+Reglas añaden comportamiento al Test de forma general.
+JUnit viene con algunas reglas predefinidas.
+
+También hay librerías que añaden nuevas reglas.
+
+Ejemplo: System Rules
+
+http://stefanbirkner.github.io/system-rules/
+
+`pom.xml`
+```xml
+<dependency>
+  <groupId>com.github.stefanbirkner</groupId>
+  <artifactId>system-rules</artifactId>
+  <version>1.16.0</version>
+  <scope>test</scope>
+</dependency>
+```
+
+---
+# JUnit: Rules
+
+Este test comprueba si se ha escrito un determinado `String` al `System.output`:
+
+```java
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.contrib.java.lang.system.SystemOutRule;
+
+public class RulesTest {
+	@Rule
+	public final SystemOutRule systemOutRule = new SystemOutRule().enableLog();
+
+	@Test
+	public void capturaSystemOut() {
+		System.out.print("hello world");
+		assertEquals("hello world", systemOutRule.getLog());
+	}
+}
+```
+---
+# JUnit: Timeout
+
+JUnit permite definir un timeout para los tests,
+de tal forma que el test fallará si excede el timeout indicado.
+
+```java
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.Timeout;
+
+public class TimeoutTest {
+
+	@Rule
+    public Timeout globalTimeout = Timeout.millis(500);
+
+    @Test
+    public void testFallaPorqueExcedeElTimeoutGlobalDeLaRegla() throws Exception {
+        TimeUnit.SECONDS.sleep(1); // sleep for 100 seconds
+    }
+
+    @Test(timeout = 200)
+    public void testFallaPorqueExcedeElTimeoutIndicadoEnLaAnotacionTest() throws Exception {
+        TimeUnit.SECONDS.sleep(1); // sleep for 100 seconds
+    }
+}
+```
+---
+# Mockito: Argument Captor
+
+Permite recuperar un parámetro que se le haya pasado al mock
+mediante una llamada a método durante el test.
+
+Ejemplo:
+
+```java
+public class MockitoArgumentCaptorTest {
+
+	@Test
+	public void test() {
+		List<String> lista = mock(List.class);
+		lista.add("Hola");
+		lista.add("Mundo");
+
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+*		verify(lista, times(2)).add(captor.capture());
+		assertThat(captor.getAllValues(), containsInAnyOrder("Hola", "Mundo"));
+	}
+
+}
+```
+---
+# Reto final
+
+## Enunciado
+En el proyecto existe una clase Tarea que se guarda en base de datos
+mediante la clase TareaRepository.
+
+## Objetivo
+Escribir un test que compruebe que efectivamente la tarea
+se guarda con la fecha y hora actual.
+
+- Nivel fácil: se puede modificar la clase Tarea ni TareaRepository
+- Nivel difícil: no se puede modificar la clase Tarea ni TareaRepository
+
+---
 TODO:
 - JUnit 4 vs 5
 - @Anotaciones avanzadas de JUnit
