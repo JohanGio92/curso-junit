@@ -562,7 +562,9 @@ public void testEspiarElMetodoGetNombreDeLaTarea() throws SQLException {
 # Hamcrest
 
 http://hamcrest.org/
+
 http://www.baeldung.com/java-junit-hamcrest-guide
+
 http://www.baeldung.com/hamcrest-collections-arrays
 
 `pom.xml`
@@ -570,9 +572,94 @@ http://www.baeldung.com/hamcrest-collections-arrays
 <dependency>
   <groupId>org.hamcrest</groupId>
   <artifactId>hamcrest-all</artifactId>
-  <version>${hamcrest.version}</version>
+  <version>1.3</version>
   <scope>test</scope>
 </dependency>
+```
+---
+# Hamcrest: Ejemplos
+```java
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+
+public class HamcrestSimpleTest {
+
+	@Test
+	public void testComparacionDeNumerosDePuntoFlotante() {
+		// PI ~ 3 ± 0.2
+	    assertThat(Math.PI, closeTo(3, 0.2));
+	}
+
+	@Test
+	public void testComparacionTexto() {
+	    assertThat("El Principito", equalToIgnoringCase("el principito"));
+	}
+
+	@Test
+	public void testColecciones() {
+		List<String> collection = Arrays.asList("ab", "cd", "ef");
+		assertThat(collection, hasItem("cd"));
+		assertThat(collection, not(hasItem("zz")));
+	}
+}
+```
+---
+![](imgs/pi-es-exactamente-3.png)
+---
+# Hamcrest: JSON
+
+https://github.com/json-path/JsonPath
+
+`pom.xml`
+```xml
+<dependency>
+    <groupId>com.jayway.jsonpath</groupId>
+    <artifactId>json-path-assert</artifactId>
+    <version>2.2.0</version>
+</dependency>
+```
+---
+# Hamcrest: JSON
+
+Dado el siguiente JSON:
+
+```json
+{
+  "message": "Hi there",
+  "quantity": 5,
+  "price": 34.56,
+  "store": {
+    "book": [
+      {
+        "author": "Evelyn Waugh"
+      }
+    ]
+  }
+}
+```
+---
+# Hamcrest: JSON
+
+Podemos verificar sus propiedades con Hamcrest:
+
+```java
+import static org.hamcrest.Matchers.*;
+import static org.junit.Assert.*;
+import static com.jayway.jsonpath.matchers.JsonPathMatchers.*;
+
+public class HamcrestJSONTest {
+
+	@Test
+	public void testVerificarJSON() {
+		String json = "{ message: 'Hi there', quantity: 5, price: 34.56, store: { book: [ {author: 'Evelyn Waugh'}] }}";
+		// Verify evaluation of JSON path
+		assertThat(json, hasJsonPath("$.message", equalTo("Hi there")));
+		assertThat(json, hasJsonPath("$.quantity", equalTo(5)));
+		assertThat(json, hasJsonPath("$.price", equalTo(34.56)));
+		assertThat(json, hasJsonPath("$.store.book[*].author", hasItem("Evelyn Waugh")));
+	}
+
+}
 ```
 ---
 # JaCoCo
