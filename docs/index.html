@@ -444,8 +444,112 @@ public void testLoginConCertificado() throws CertificateException, SQLException 
 ```
 ---
 # Verificación de Mocks
+- Mockito permite verificar que las llamadas que hemos programado se hayan realizado.
+- Juega el papel del **"assert"** para métodos que no devuelven nada (ej: insertar en BDD)
+- Sirve para minimizar el riesgo de falsos positivos.
+---
+# Ejemplo: Verificación de Mocks
+```java
+public class TareaRepository {
+
+	private Connection connection;
+
+	public TareaRepository(Connection connection) {
+		this.connection = connection;
+	}
+
+	public void save(Tarea tarea) {
+		PreparedStatement prepareStatement = null;
+		try {
+			prepareStatement = connection.prepareStatement("INSERT INTO tareas VALUES (?)");
+			prepareStatement.setString(1, tarea.getNombre());
+*			prepareStatement.executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (prepareStatement != null) {
+					prepareStatement.close();
+				}
+				if (connection != null) {
+					connection.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+
+	}
+
+}
+```
+---
+# Ejemplo: Verificación de Mocks
+```java
+@Test
+public void testVerificarLaLlamadaAlMockDePreparedStatement() throws SQLException {
+  Tarea tarea = new Tarea("Aprender Mock.verify()");
+  Connection connection = mock(Connection.class);
+  PreparedStatement preparedStatement = mock(PreparedStatement.class);
+  when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+
+  TareaRepository repository = new TareaRepository(connection);
+*  repository.save(tarea);
+
+  // Dado que save() no devuelve nada,
+  // uso mock.verify() para saber si se ha guardado la Tarea
+*  verify(preparedStatement).executeUpdate();
+}
+```
+---
+# Ejemplo: Verificación de Mocks
+```java
+@Test
+public void testVerificarQueSeCierraLaConexionEnCasoDeError() throws SQLException {
+  Tarea tarea = new Tarea("Aprender Mock.verify()");
+  Connection connection = mock(Connection.class);
+  PreparedStatement preparedStatement = mock(PreparedStatement.class);
+  when(preparedStatement.executeUpdate())
+*    .thenThrow(new SQLException("Excepcion lanzada por Mockito de forma intencionada"));
+  when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+
+  TareaRepository repository = new TareaRepository(connection);
+  repository.save(tarea);
+
+  // Puedo verificar llamadas a métodos que no he programado
+  verify(connection).close();
+  verify(preparedStatement).close();
+
+  // Ejercicio: Estos asserts fallarían, ¿Por qué?
+  //assertTrue(connection.isClosed());
+  //assertTrue(preparedStatement.isClosed());
+
+}
+```
 ---
 # Mockito: Spies
+- Sirve para verificar llamadas a métodos de objetos "reales"
+
+Ejemplo:
+```java
+@Test
+public void testEspiarElMetodoGetNombreDeLaTarea() throws SQLException {
+  Tarea tarea = new Tarea("Aprender Mock.verify()");
+*  Tarea spy = spy(tarea);
+
+  Connection connection = mock(Connection.class);
+  PreparedStatement preparedStatement = mock(PreparedStatement.class);
+  when(preparedStatement.executeUpdate())
+    .thenThrow(new SQLException("Excepcion lanzada por Mockito de forma intencionada"));
+  when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
+
+  TareaRepository repository = new TareaRepository(connection);
+*  repository.save(spy);
+
+  // Verifico que el Repository ha consultado el nombre de la tarea
+  verify(spy).getNombre();
+}
+```
 ---
 # Propiedades deseables en una suite de pruebas
 ## Siglas en inglés: FIRST
@@ -627,7 +731,7 @@ public class CienPorCienCoberturaConErroresTest {
 TODO:
 - JUnit 4 vs 5
 - @Anotaciones avanzadas de JUnit
-
+- Mockito, argument captor
     </textarea>
     <script src="https://remarkjs.com/downloads/remark-latest.min.js">
     </script>
