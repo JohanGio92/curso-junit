@@ -561,6 +561,9 @@ public void testEspiarElMetodoGetNombreDeLaTarea() throws SQLException {
 ---
 # Hamcrest
 
+Es una librería de **Matchers** que facilita verificar expectativas de un test.
+También produce mensajes de error más claros cuando una expectativa no se cumple.
+
 http://hamcrest.org/
 
 http://www.baeldung.com/java-junit-hamcrest-guide
@@ -815,6 +818,32 @@ public class CienPorCienCoberturaConErroresTest {
 
 ![](imgs/philosoraptor-3.jpg)
 ---
+# Extra: Granularidad de los Test
+
+## Unitarios:
+
+Prueban una "unidad" del sistema, sin dependencias de otros módulos.
+
+## De Integración:
+
+Prueban la integración de una parte del código base con otro módulo o sistema.
+El ejemplo más típico es código que actúa contra la base de datos.
+
+---
+# Extra: Granularidad de los Test
+
+## Proporción Unitarios/Integración
+- Idealmente, la mayoría de los tests deben ser **unitarios**.
+- Los test de integración _tienden_ a ser lentos o requerir de un entorno
+más elaborado.
+- Los tests unitarios _deben_ ser rápidos porque se _deben_ ejecutar constantemente.
+
+![](imgs/test-pyramid.png)
+
+---
+# Bonus: Test Parametrizados
+
+
 TODO:
 - JUnit 4 vs 5
 - @Anotaciones avanzadas de JUnit
