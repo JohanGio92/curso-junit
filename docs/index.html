@@ -13,6 +13,21 @@
         font-family: 'Yanone Kaffeesatz';
         font-weight: normal;
       }
+      .remark-slide-content {
+        font-size: 1.6em;
+        padding-left: 6em;
+      }
+      .remark-slide-content h1 {
+        font-size: 1.8em;
+        text-align: center;
+        letter-spacing: 0.1em;
+      }
+      .small .remark-code {
+        font-size: 0.4em;
+      }
+      .medium .remark-code {
+        font-size: 0.5em;
+      }
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
       /* Two-column layout */
     .left-column {
@@ -32,6 +47,8 @@
     .footer {
         position: absolute;
         bottom: 3em;
+        font-family: sans-serif;
+        font-weight: lighter;;
       }
     </style>
   </head>
@@ -42,11 +59,15 @@ class: center, middle
 background-image: url(imgs/bg.jpg)
 
 # Curso de JUnit, Jacoco y Mockito
+.footer.left[
+Mariano Eloy Fernández Osca
 
+geekshubsacademy.com
+]
 ---
 layout: true
 background-image: url(imgs/bg.jpg)
-background-size: 150%
+
 ---
 # Contenido: Resumen
 
@@ -93,16 +114,15 @@ background-size: 150%
 # "Código que prueba **_automáticamente_** el correcto funcionamiento de otro código"
 
 ---
-
 # Cuestiones filosóficas
+.center[
 ![](imgs/philosoraptor.png)
+]
 ---
 ![](imgs/watchmen.png)
 ---
 
-# Ejemplo
-
-# Test en JUnit
+# Ejemplo: Test en JUnit
 
 ```java
 public class Test {
@@ -185,15 +205,17 @@ http://junit.org/junit4/
 ```
 ---
 # Eclipse
-
+.center[
 ![](imgs/eclipse-import-maven-project.png)
+]
 ---
 #JUnit
 Para ejecutar JUnit desde Eclipse:
 
 Sobre la clase de Test --> click derecho --> Run As --> JUnit
-
+.center[
 ![](imgs/eclipse-run-junit.png)
+]
 ---
 #JUnit
 Resultados:
@@ -201,23 +223,22 @@ Resultados:
 - Azul: El test no ha satisfecho las expectativas
 - Verde: El test ha pasado OK.
 
+.center[
 ![](imgs/eclipse-junit-resultados.png)
-
+]
 ---
-class: middle, center
-
 # @Anotaciones de JUnit
-# Ciclo de Vida de un Test
-## @BeforeClass
-## @Before
-## @Test
-## @After
-## @AfterClass
-### @Ignore
+## Ciclo de Vida de un Test
+- @BeforeClass
+- @Before
+- @Test
+- @After
+- @AfterClass
+- @Ignore
 
 ---
 # Demo: Ciclo de Vida
-
+.medium[
 ```java
 public class CicloVidaTest {
 
@@ -255,6 +276,7 @@ public class CicloVidaTest {
 
 }
 ```
+]
 ---
 # Ejercicio:
 En el proyecto de Eclipse hay una clase ValidadorEmail.
@@ -267,8 +289,9 @@ Sospechamos que funciona mal.
  Consejo: Usa las anotaciones del ciclo de vida.
 ---
 # Cuestiones Filosóficas II
-
+.center[
 ![](imgs/philosoraptor-3.jpg)
+]
 ---
 # Motivos frecuentes para no testear
 
@@ -311,8 +334,7 @@ cuando se llama a los métodos del objeto instanciado"
 </dependency>
 ```
 ---
-# Mockito: Ejemplo
-## Login con Certificado digital
+# Ejemplo: Login con Certificado digital
 ```java
 public class LoginController {
 
@@ -361,7 +383,7 @@ public void testLoginConCertificado() throws CertificateException {
 
 ---
 # Ejemplo: Test con Mockito
-- No necesito un fichero con un Certificado ni una BDD con datos de prueba
+- No necesito un Certificado en fichero ni una BDD con datos de prueba
 - Mockito le dice a los objetos qué valores tienen que devolver
 
 ```java
@@ -410,7 +432,9 @@ public void testSinSentido() throws CertificateException {
 ```
 ---
 # Caja blanca vs caja negra
+.center[
 ![](imgs/caja-blanca-caja-negra.png)
+]
 ---
 # Caja blanca: Peligro!
 - Los test de caja blanca tienen la desventaja de necesitar conocer
@@ -522,7 +546,7 @@ public void testVerificarQueSeCierraLaConexionEnCasoDeError() throws SQLExceptio
   verify(connection).close();
   verify(preparedStatement).close();
 
-  // Ejercicio: Estos asserts fallarían, ¿Por qué?
+*  // Ejercicio: Estos asserts fallarían, ¿Por qué?
   //assertTrue(connection.isClosed());
   //assertTrue(preparedStatement.isClosed());
 
@@ -609,7 +633,10 @@ public class HamcrestSimpleTest {
 }
 ```
 ---
+# Trivia
+.center[
 ![](imgs/pi-es-exactamente-3.png)
+]
 ---
 # Hamcrest: JSON
 
@@ -671,6 +698,7 @@ public class HamcrestJSONTest {
 https://github.com/jacoco/jacoco
 
 Configuración en Maven:
+.small[
 ```xml
 <plugin>
 				<groupId>org.jacoco</groupId>
@@ -712,6 +740,7 @@ Configuración en Maven:
 				</configuration>
 			</plugin>
 ```
+]
 ---
 # JaCoCo
 
@@ -730,10 +759,14 @@ target/jacoco-ut/index.html
 **NOTA**: JaCoCo sólo genera los informes si todos los tests pasan OK.
 ---
 # Cobertura
+#
+.center[
+"La cobertura de un código base se refiere
 
-Se refiere a las líneas de código que han sido ejecutadas
-como resultado de pasar los tests.
+a las líneas de código que han sido ejecutadas
 
+como resultado de pasar los tests."
+]
 ---
 # Demo: Cobertura
 ```java
@@ -785,7 +818,9 @@ Informe de cobertura de la clase Direccion:
 ![](imgs/jacoco-cien-por-cien.png)
 ---
  # Cuestiones filosóficas IV
+ .center[
  ![](imgs/philosoraptor-2.jpg)
+ ]
 ---
 # Contraejemplo:
 
@@ -828,21 +863,19 @@ El ejemplo más típico es código que actúa contra la base de datos.
 ---
 # Extra: Granularidad de los Test
 
-## Proporción Unitarios/Integración
 - Idealmente, la mayoría de los tests deben ser **unitarios**.
 - Los test de integración _tienden_ a ser lentos o requerir de un entorno
 más elaborado.
 - Los tests unitarios _deben_ ser rápidos porque se _deben_ ejecutar constantemente.
 
+.center[
 ![](imgs/test-pyramid.png)
-
+]
 ---
 # JUnit: Categorías de Tests
 
 La anotación @Category asocia un Test a un grupo
 que luego se puede ejecutar individualmente.
-
-Ejemplo:
 
 ```java
 import org.junit.Test;
