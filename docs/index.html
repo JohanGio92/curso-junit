@@ -7,6 +7,7 @@
       @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
       @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
       @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+      @import url(https://fonts.googleapis.com/css?family=Roboto+Condensed);
 
       body { font-family: 'Droid Serif'}
       h1, h2, h3 {
@@ -26,7 +27,7 @@
         font-size: 0.4em;
       }
       .medium .remark-code {
-        font-size: 0.5em;
+        font-size: 0.6em;
       }
       .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
       /* Two-column layout */
@@ -47,9 +48,15 @@
     .footer {
         position: absolute;
         bottom: 3em;
-        font-family: sans-serif;
-        font-weight: lighter;;
+        font-family: 'Roboto Condensed', sans-serif;
       }
+    .footer .orange {
+      color: #FF3D00;
+    }
+    .toc {
+      padding-left: 4em;
+      font-size: 1.5em;
+    }
     </style>
   </head>
   <body>
@@ -61,8 +68,9 @@ background-image: url(imgs/bg.jpg)
 # Curso de JUnit, Jacoco y Mockito
 .footer.left[
 Mariano Eloy Fernández Osca
-
-geekshubsacademy.com
+  .orange[
+    geekshubsacademy.com
+  ]
 ]
 ---
 layout: true
@@ -70,15 +78,16 @@ background-image: url(imgs/bg.jpg)
 
 ---
 # Contenido: Resumen
-
+.toc[
 0. Testing
 1. JUnit
 2. Jacoco
 3. Mockito
 5. Reto
-
+]
 ---
 # Testing
+.toc[
   1. Qué es Software Testing?
     1. Modelo: SUT, Parametros, Dependencias
     2. ¿Quién prueba que el test es correcto?
@@ -88,29 +97,35 @@ background-image: url(imgs/bg.jpg)
       - Falacias de caja blanca
   3. Granularidad: Unitarios, Integración, Aceptación
   4. Test vs Code
-
+]
 ---
 # JUnit
+.toc[
   1. Test: Hola Mundo
   2. @Test, @Before, ...
   3. Assertions
     1. JUnit
     2. Hamcrest
+]
 ---
 # Jacoco
+.toc[
   1. Qué es cobertura de código y por qué la quiero
   2. Integración continua
   3. Ejecución con Maven
+]
 ---
 # Mockito
+.toc[
   1. Mocks
   2. Spies
   3. Argument Captors
+]
 ---
 # Reto
 ---
-
 # Qué es un test
+#
 # "Código que prueba **_automáticamente_** el correcto funcionamiento de otro código"
 
 ---
@@ -475,6 +490,7 @@ public void testLoginConCertificado() throws CertificateException, SQLException 
 - Sirve para minimizar el riesgo de falsos positivos.
 ---
 # Ejemplo: Verificación de Mocks
+.medium[
 ```java
 public class TareaRepository {
 
@@ -504,11 +520,10 @@ public class TareaRepository {
 				e.printStackTrace();
 			}
 		}
-
 	}
-
 }
 ```
+]
 ---
 # Ejemplo: Verificación de Mocks
 ```java
