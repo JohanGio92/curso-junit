@@ -8,7 +8,7 @@
       @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
       @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
 
-      body { font-family: 'Droid Serif'; }
+      body { font-family: 'Droid Serif'}
       h1, h2, h3 {
         font-family: 'Yanone Kaffeesatz';
         font-weight: normal;
@@ -29,15 +29,24 @@
       float: right;
       padding-top: 1em;
     }
+    .footer {
+        position: absolute;
+        bottom: 3em;
+      }
     </style>
   </head>
   <body>
     <textarea id="source">
 
 class: center, middle
+background-image: url(imgs/bg.jpg)
 
 # Curso de JUnit, Jacoco y Mockito
 
+---
+layout: true
+background-image: url(imgs/bg.jpg)
+background-size: 150%
 ---
 # Contenido: Resumen
 
@@ -256,9 +265,10 @@ Sospechamos que funciona mal.
  pero en ningún caso deberían arrojar una Excepción (rojo)."
 
  Consejo: Usa las anotaciones del ciclo de vida.
- ---
- # Cuestiones filosóficas II
- ![](imgs/philosoraptor-2.jpg)
+---
+# Cuestiones Filosóficas II
+
+![](imgs/philosoraptor-3.jpg)
 ---
 # Motivos frecuentes para no testear
 
@@ -382,7 +392,7 @@ public void testLoginConCertificado() throws CertificateException, SQLException 
 }
 ```
 ---
-# Cuestiones Filosóficas IV
+# Cuestiones Filosóficas III
 ¿Y si directamente _mockeo_ la clase LoginController?
 Este test pasa Ok!
 ```java
@@ -774,6 +784,9 @@ Informe de cobertura de la clase Direccion:
 
 ![](imgs/jacoco-cien-por-cien.png)
 ---
+ # Cuestiones filosóficas IV
+ ![](imgs/philosoraptor-2.jpg)
+---
 # Contraejemplo:
 
 ## 100% cobertura != código libre de fallos
@@ -800,10 +813,6 @@ public class CienPorCienCoberturaConErroresTest {
 	}
 }
 ```
----
-# Cuestiones Filosóficas III
-
-![](imgs/philosoraptor-3.jpg)
 ---
 # Extra: Granularidad de los Test
 
@@ -982,7 +991,8 @@ se guarda con la fecha y hora actual.
     </script>
     <script>
       var slideshow = remark.create({
-        highlightLines: true
+        highlightLines: true,
+        ratio: '16:9'
       });
     </script>
   </body>
