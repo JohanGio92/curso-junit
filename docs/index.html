@@ -14,6 +14,13 @@
         font-family: 'Yanone Kaffeesatz';
         font-weight: normal;
       }
+      th, td {
+        border: 1px solid grey;
+        padding: 0.4em;
+      }
+      table {
+        border-collapse: collapse;
+      }
       .remark-slide-content {
         font-size: 1.6em;
         padding-left: 6em;
@@ -629,12 +636,6 @@ import static org.junit.Assert.*;
 public class HamcrestSimpleTest {
 
 	@Test
-	public void testComparacionDeNumerosDePuntoFlotante() {
-		// PI ~ 3 ± 0.2
-	    assertThat(Math.PI, closeTo(3, 0.2));
-	}
-
-	@Test
 	public void testComparacionTexto() {
 	    assertThat("El Principito", equalToIgnoringCase("el principito"));
 	}
@@ -644,6 +645,12 @@ public class HamcrestSimpleTest {
 		List<String> collection = Arrays.asList("ab", "cd", "ef");
 		assertThat(collection, hasItem("cd"));
 		assertThat(collection, not(hasItem("zz")));
+	}
+
+	@Test
+	public void testComparacionDeNumerosDePuntoFlotante() {
+		// PI ~ 3 ± 0.2
+*    assertThat(Math.PI, closeTo(3, 0.2));
 	}
 }
 ```
@@ -1021,7 +1028,118 @@ public class MockitoArgumentCaptorTest {
 }
 ```
 ---
-# Reto final
+# TDD: Test Driven Development
+
+"TDD es una técnica de desarrollo de software
+que consiste fundamentalmente
+en escribir el test **antes** que el código"
+
+## Ciclo de vida Red-Green-Refactor
+1. Red: Escribir un test que falle (ya que el código no está escrito)
+2. Green: Escribir el mínimo código que haga pasar el test
+3. Refactor: Mejorar la implementación del código sin romper el test
+4. Repetir
+
+## Implicaciones
+- Hay que tener claras las pruebas que escribir antes de empezar
+- El código va tomando forma a imagen y semejanza de los tests
+---
+# Ejemplo TDD: Diseño de un validador de letra de DNI.
+
+Especificación:
+
+http://www.interior.gob.es/web/servicios-al-ciudadano/dni/calculo-del-digito-de-control-del-nif-nie
+
+> "Para verificar el NIF de españoles residentes mayores de edad, el algoritmo de cálculo del dígito de control es el siguiente:
+Se divide el número entre 23 y el resto se sustituye por una letra que se determina por inspección mediante la siguiente tabla:
+
+|RESTO|	0|	1|	2|	3|	4|	5|	6|	7|	8|	9|	10|	11|
+|-----|--|---|---|---|---|---|---|---|---|---|----|---|
+|LETRA|	T|	R|	W|	A|	G|	M|	Y|	F|	P|	D|	X|	B|
+
+|RESTO| 12| 13| 14| 15| 16| 17| 18| 19| 20| 21| 22|
+|-----|---|---|---|---|---|---|---|---|---|---|---|
+|LETRA|	N|	J|	Z|	S|	Q|	V|	H|	L|	C|	K|	E|
+
+
+---
+# Ejemplo TDD
+
+## Paso 1: Red
+
+```java
+public class ValidadorDNITest {
+
+	@Test
+	public void lasPrimeras8PosicionesDebeSerDigitos() {
+		assertTrue(ValidadorDNI.validar("12345678Z"));
+	}
+
+}
+```
+
+```java
+public class ValidadorDNI {
+
+	public static boolean validar(String string) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+}
+```
+---
+# Ejemplo TDD
+
+## Paso 1: Red
+.center[
+![](imgs/tdd-red.png)
+]
+---
+# Ejemplo TDD
+
+## Paso 2: Green
+
+```java
+public class ValidadorDNI {
+
+	public static boolean validar(String string) {
+*		return true;
+	}
+
+}
+```
+.center[
+![](imgs/tdd-green.png)
+]
+---
+# Ejemplo TDD
+
+## Paso 3: Refactor
+
+```java
+public class ValidadorDNI {
+
+*	public static boolean validar(String dni) {
+		return true;
+	}
+
+}
+```
+
+---
+# Reto TDD
+
+"Desarrollar una clase Sudoku que permita rellenarlo
+y verificar si es una solución válida"
+
+Pista: Es útil contar con un generado de Sudokus
+
+http://www.sudoku-online.org/
+
+
+---
+# Reto Testing
 
 ## Enunciado
 En el proyecto existe una clase Tarea que se guarda en base de datos

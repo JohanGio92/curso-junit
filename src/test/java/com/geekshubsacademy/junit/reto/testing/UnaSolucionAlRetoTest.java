@@ -1,4 +1,4 @@
-package com.geekshubsacademy.junit.reto;
+package com.geekshubsacademy.junit.reto.testing;
 
 import static org.hamcrest.Matchers.closeTo;
 import static org.junit.Assert.assertThat;

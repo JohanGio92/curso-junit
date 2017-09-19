@@ -1,4 +1,4 @@
-package com.geekshubsacademy.junit.reto;
+package com.geekshubsacademy.junit.reto.testing;
 
 import java.sql.SQLException;
 
