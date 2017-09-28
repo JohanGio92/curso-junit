@@ -17,7 +17,6 @@ import org.mockito.ArgumentCaptor;
 
 import com.geekshubsacademy.junit.v6.Tarea;
 import com.geekshubsacademy.junit.v6.TareaRepository;
-import com.geekshubsacademy.junit.v6.TareaRepository.FechaActualProvider;
 
 public class UnaSolucionNivelFacilAlRetoTest {
 
@@ -30,10 +29,19 @@ public class UnaSolucionNivelFacilAlRetoTest {
 		when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
 
 		TareaRepository repository = new TareaRepository(connection);
+		
+		Date fechaActual = new Date();
+		/* La solución consiste en modificar TareaRepository
+		 * para añadir el colaborador FechaActualProvider
+		 * que es una static inner class de TareaRepository
+		 * RESUMEN: Descomentar el bloque de código y modificar
+		 * TareaRepository hasta que compile.
+		 */
+		/*
 		FechaActualProvider fechaActualProvider = mock(FechaActualProvider.class);
 		repository.setFechaActualProvider(fechaActualProvider);
-		Date fechaActual = new Date();
 		when(fechaActualProvider.getFechaActual()).thenReturn(fechaActual);
+		*/
 		
 		// Probar
 		repository.save(tarea);
