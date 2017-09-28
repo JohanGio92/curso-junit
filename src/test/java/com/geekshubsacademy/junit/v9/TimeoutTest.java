@@ -12,11 +12,11 @@ public class TimeoutTest {
 
     @Test
     public void testFallaPorqueExcedeElTimeoutGlobalDeLaRegla() throws Exception {
-        TimeUnit.SECONDS.sleep(1); // sleep for 100 seconds
+        TimeUnit.MILLISECONDS.sleep(1000);
     }
 
     @Test(timeout = 200)
     public void testFallaPorqueExcedeElTimeoutIndicadoEnLaAnotacionTest() throws Exception {
-        TimeUnit.SECONDS.sleep(1); // sleep for 100 seconds
+        TimeUnit.MILLISECONDS.sleep(250);
     }
 }
