@@ -15,16 +15,12 @@ public class ResultadosDeUnTest {
 
 	@Test
 	public void esteTestFalla() {
-		fail("Not yet implemented");
+		assertEquals(3, 1+1);
 	}
 
 	@Test
 	public void esteTestPasa() {
-		int resultado = suma(1, 2);
-		assertEquals(3, resultado);
+		assertEquals(2, 1+1);
 	}
 
-	public int suma(int a, int b) {
-		return a + b;
-	}
 }
