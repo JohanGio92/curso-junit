@@ -14,21 +14,25 @@ public class VerificacionDeMocksTest {
 
 	@Test
 	public void testVerificarLaLlamadaAlMockDePreparedStatement() throws SQLException {
+		// Preparar
 		Tarea tarea = new Tarea("Aprender Mock.verify()");
 		Connection connection = mock(Connection.class);
 		PreparedStatement preparedStatement = mock(PreparedStatement.class);
 		when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
 
+		// Probar
 		TareaRepository repository = new TareaRepository(connection);
 		repository.save(tarea);
 
 		// Dado que save() no devuelve nada, 
 		// uso mock.verify() para saber si se ha guardado la Tarea 
 		verify(preparedStatement).executeUpdate();
+		verify(preparedStatement).setString(1, "Aprender Mock.verify()");
 	}
 
 	@Test
 	public void testVerificarQueSeCierraLaConexionEnCasoDeError() throws SQLException {
+		// Preparar
 		Tarea tarea = new Tarea("Aprender Mock.verify()");
 		Connection connection = mock(Connection.class);
 		PreparedStatement preparedStatement = mock(PreparedStatement.class);
@@ -51,6 +55,7 @@ public class VerificacionDeMocksTest {
 
 	@Test
 	public void testEspiarElMetodoGetNombreDeLaTarea() throws SQLException {
+		// Preparar
 		Tarea tarea = new Tarea("Aprender Mock.verify()");
 		Tarea spy = spy(tarea);
 
@@ -60,6 +65,7 @@ public class VerificacionDeMocksTest {
 			.thenThrow(new SQLException("Excepcion lanzada por Mockito de forma intencionada"));
 		when(connection.prepareStatement(anyString())).thenReturn(preparedStatement);
 
+		// Probar
 		TareaRepository repository = new TareaRepository(connection);
 		repository.save(spy);
 
