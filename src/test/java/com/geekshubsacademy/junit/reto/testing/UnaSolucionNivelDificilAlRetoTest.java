@@ -18,7 +18,7 @@ import org.mockito.ArgumentCaptor;
 import com.geekshubsacademy.junit.v6.Tarea;
 import com.geekshubsacademy.junit.v6.TareaRepository;
 
-public class UnaSolucionAlRetoTest {
+public class UnaSolucionNivelDificilAlRetoTest {
 
 	/**
 	 * Esta es una posible solución al Reto de verificar
