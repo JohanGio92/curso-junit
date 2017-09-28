@@ -1,9 +1,6 @@
 package com.geekshubsacademy.junit.v7;
 
-import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.equalToIgnoringCase;
-import static org.hamcrest.Matchers.hasItem;
-import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
